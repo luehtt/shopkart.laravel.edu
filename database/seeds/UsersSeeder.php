@@ -28,9 +28,7 @@ class UsersSeeder extends Seeder
         $user_roles[] = ['id' => 4, 'name' => 'ETC', 'locale' => 'Etc'];
 
         DB::table('user_roles')->truncate();
-        foreach ($user_roles as $i) {
-            DB::table('user_roles')->insert($i);
-        };
+        DB::table('user_roles')->insert($user_roles);
     }
 
     private function seedUsers() {
