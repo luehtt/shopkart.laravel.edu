@@ -17,8 +17,9 @@ class CreateClothingsTable extends Migration
             $table->increments('id');
             $table->string('name', 255);
             $table->integer('brand_id');
+            $table->integer('category_id');
             $table->string('color', 32)->nullable();
-            $table->string('size', 4)->nullable();
+            $table->integer('size')->default(1);
             $table->integer('gender')->default(1);
             $table->integer('age')->default(1);
             $table->string('material', 128)->nullable();

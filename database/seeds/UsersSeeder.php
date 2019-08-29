@@ -27,99 +27,78 @@ class UsersSeeder extends Seeder
         $user_roles[] = ['id' => 3, 'name' => 'CUSTOMER', 'locale' => 'Customer'];
         $user_roles[] = ['id' => 4, 'name' => 'ETC', 'locale' => 'Etc'];
 
-        DB::table('user_roles')->truncate();
-        DB::table('user_roles')->insert($user_roles);
+        DatabaseSeeder::insert('user_roles', $user_roles);
     }
 
     private function seedUsers() {
         $faker = Faker::create();
 
         // init list of user full name
-        $totalUser = SeederConst::ADMIN_AMOUNT + SeederConst::MANAGER_AMOUNT + SeederConst::CUSTOMER_AMOUNT;
+        $totalUser = DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT + DatabaseConst::CUSTOMER_AMOUNT;
         for ($i = 0; $i < $totalUser; $i++) {
-            if ($i % 2 == 0) {
-                $usernames[] = ['firstName' => $faker->firstNameMale, 'lastName' => $faker->lastName, 'male' => true];
-            } else {
-                $usernames[] = ['firstName' => $faker->firstNameFemale, 'lastName' => $faker->lastName, 'male' => false];
-            }
+            $usernames[] = $i % 2 == 0 ?
+                ['firstName' => $faker->firstNameMale, 'lastName' => $faker->lastName, 'male' => true] :
+                ['firstName' => $faker->firstNameFemale, 'lastName' => $faker->lastName, 'male' => false];
         }
 
         // insert user
         if (!isset($usernames)) return null;
-        $timestamp = Carbon::now();
-        $password = Hash::make(SeederConst::DEFAULT_PASSWORD);
+        $password = Hash::make(DatabaseConst::DEFAULT_PASSWORD);
         $users = array();
-
         for ($i = 0; $i < $totalUser; $i++) {
             $username = strtolower($usernames[$i]['firstName'].$usernames[$i]['lastName']);
-            $user_role_id = $i < SeederConst::ADMIN_AMOUNT ? 1 : $i < SeederConst::ADMIN_AMOUNT + SeederConst::MANAGER_AMOUNT ? 2 : 3;
             $users[] = ['id' => $i + 1,
                 'username' => $username,
-                'email' => $username."@demo.com",
+                'email' => $username.'@'.$faker->freeEmailDomain,
                 'password' => $password,
-                "user_role_id" => $user_role_id,
-                "created_at" => $timestamp,
-                "updated_at" => $timestamp];
+                "user_role_id" => $i < DatabaseConst::ADMIN_AMOUNT ? 1 : $i < DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT ? 2 : 3,
+            ];
         }
 
-        DB::table('users')->truncate();
-        foreach ($users as $i) {
-            DB::table('users')->insert($i);
-        };
+        DatabaseSeeder::insertTimestamp('users', $users);
 
         // insert manager
         $managers = array();
-        for ($i = SeederConst::ADMIN_AMOUNT; $i < SeederConst::ADMIN_AMOUNT + SeederConst::MANAGER_AMOUNT; $i++) {
+        for ($i = DatabaseConst::ADMIN_AMOUNT; $i < DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT; $i++) {
             $fullname = $usernames[$i]['firstName']." ".$usernames[$i]['lastName'];
             $birth = $this->calcBirth($faker);
+            $address = 
             $managers[] = ['user_id' => $i + 1,
-                'fullname' => $fullname,
-                'birth' => $birth,
+                'fullname' => $usernames[$i]['firstName']." ".$usernames[$i]['lastName'],
+                'birth' => $this->calcBirth($faker),
                 'male' => $usernames[$i]['male'],
-                'address' => $faker->address,
-                'phone' => $faker->tollFreePhoneNumber];
+                'address' => $faker->streetAddress.', '.$faker->city.', '.$faker->country,
+                'phone' => strtok($faker->e164PhoneNumber,' ')
+            ];
         }
 
-        DB::table('managers')->truncate();
-        foreach ($managers as $i) {
-            DB::table('managers')->insert($i);
-        };
+        DatabaseSeeder::insert('managers', $managers);
 
         // insert customer
         $customers = array();
-        for ($i = SeederConst::ADMIN_AMOUNT + SeederConst::MANAGER_AMOUNT; $i < $totalUser; $i++) {
+        for ($i = DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT; $i < $totalUser; $i++) {
             $fullname = $usernames[$i]['firstName']." ".$usernames[$i]['lastName'];
             $birth = $this->calcBirth($faker);
             $customers[] = ['user_id' => $i + 1,
-                'fullname' => $fullname,
-                'birth' => $birth,
+                'fullname' => $usernames[$i]['firstName']." ".$usernames[$i]['lastName'],
+                'birth' => $this->calcBirth($faker),
                 'male' => $usernames[$i]['male'],
-                'address' => $faker->address,
-                'phone' => $faker->tollFreePhoneNumber];
+                'address' => $faker->streetAddress.', '.$faker->city.', '.$faker->country,
+                'phone' => strtok($faker->e164PhoneNumber,' ')
+            ];
         }
 
-        DB::table('customers')->truncate();
-        foreach ($customers as $i) {
-            DB::table('customers')->insert($i);
-        };
+        DatabaseSeeder::insert('customers', $customers);
     }
 
     private function calcBirth($faker) {
         $year = Carbon::now()->year;
-        $roll = $faker->numberBetween($min = 0, $max = 10);
+        $roll = $faker->numberBetween($min = 1, $max = 10);
 
-        switch ($roll) {
-            case 0:
-                return $faker->numberBetween($year - SeederConst::YOUNG_ADULT, $year - SeederConst::ADOLESCENT);
-            case 1: case 2: case 3: case 4: case 5:
-                return $faker->numberBetween($year - SeederConst::MIDDLE_ADULT, $year - SeederConst::YOUNG_ADULT);
-            case 6: case 7: case 8:
-                return $faker->numberBetween($year - SeederConst::OLD_ADULT, $year - SeederConst::MIDDLE_ADULT);
-            case 9:
-                return $faker->numberBetween($year - SeederConst::UPPER_LIMIT, $year - SeederConst::OLD_ADULT);
-        }
-
-        return $year;
+        if ($roll <= 1) return $faker->numberBetween($year - DatabaseConst::YOUNG_ADULT, $year - DatabaseConst::ADOLESCENT);
+        else if ($roll <= 5) return $faker->numberBetween($year - DatabaseConst::YOUNG_ADULT, $year - DatabaseConst::ADOLESCENT);
+        else if ($roll <= 9) return $faker->numberBetween($year - DatabaseConst::OLD_ADULT, $year - DatabaseConst::MIDDLE_ADULT);
+        else return $faker->numberBetween($year - DatabaseConst::UPPER_LIMIT, $year - DatabaseConst::OLD_ADULT);
     }
 
 }
