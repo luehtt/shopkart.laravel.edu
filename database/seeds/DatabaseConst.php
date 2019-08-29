@@ -15,7 +15,7 @@ class DatabaseConst
     public const DEFAULT_PASSWORD = 'password';
     public const DEFAULT_OFFSET_YEAR = -3;
 
-    public const ADOLESCENT = 14;
+    public const ADOLESCENT = 12;
     public const YOUNG_ADULT = 18;
     public const MIDDLE_ADULT = 30;
     public const OLD_ADULT = 60;
