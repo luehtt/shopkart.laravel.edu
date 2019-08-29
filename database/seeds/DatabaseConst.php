@@ -17,8 +17,8 @@ class DatabaseConst
 
     public const ADOLESCENT = 12;
     public const YOUNG_ADULT = 18;
-    public const MIDDLE_ADULT = 30;
-    public const OLD_ADULT = 60;
+    public const MIDDLE_ADULT = 45;
+    public const OLD_ADULT = 65;
     public const UPPER_LIMIT = 100;
 
     public const CLOTHING_AMOUNT = 100000;
