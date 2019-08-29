@@ -1,0 +1,23 @@
+<?php
+use Carbon\Carbon;
+use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+class SeederFunc extends Seeder
+{
+    public static function insert($table_name, $data)
+    {
+        DB::table($table_name)->truncate();
+        DB::table($table_name)->insert($data);
+    }
+    
+    public static function insertTimestamp($table_name, $data)
+    {
+        for
+    
+        DB::table($table_name)->truncate();
+        DB::table($table_name)->insert($data);
+    }
+    
+}
