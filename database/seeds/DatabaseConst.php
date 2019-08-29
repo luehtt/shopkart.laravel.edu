@@ -10,9 +10,10 @@ class DatabaseConst
 {
     public const ADMIN_AMOUNT = 5;
     public const MANAGER_AMOUNT = 25;
-    public const CUSTOMER_AMOUNT = 2500;
+    public const CUSTOMER_AMOUNT = 1000;
     
     public const DEFAULT_PASSWORD = 'password';
+    public const TRANSACTION_LIMIT = 500;
     public const DEFAULT_OFFSET_YEAR = -3;
 
     public const ADOLESCENT = 12;

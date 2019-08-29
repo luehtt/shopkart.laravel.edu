@@ -3,7 +3,6 @@
 use Carbon\Carbon;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UsersSeeder extends Seeder
@@ -36,9 +35,10 @@ class UsersSeeder extends Seeder
         // init list of user full name
         $totalUser = DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT + DatabaseConst::CUSTOMER_AMOUNT;
         for ($i = 0; $i < $totalUser; $i++) {
+            $timestamp = $faker->dateTimeBetween($startDate = DatabaseConst::DEFAULT_OFFSET_YEAR.' years', $endDate = 'now')->format('Y-m-d H:i:s');
             $usernames[] = $i % 2 == 0 ?
-                ['firstName' => $faker->firstNameMale, 'lastName' => $faker->lastName, 'male' => true] :
-                ['firstName' => $faker->firstNameFemale, 'lastName' => $faker->lastName, 'male' => false];
+                ['firstName' => $faker->firstNameMale, 'lastName' => $faker->lastName, 'male' => true, 'timestamp' => $timestamp] :
+                ['firstName' => $faker->firstNameFemale, 'lastName' => $faker->lastName, 'male' => false, 'timestamp' => $timestamp];
         }
 
         // insert user
@@ -51,24 +51,25 @@ class UsersSeeder extends Seeder
                 'username' => $username,
                 'email' => $username.'@'.$faker->freeEmailDomain,
                 'password' => $password,
-                "user_role_id" => $i < DatabaseConst::ADMIN_AMOUNT ? 1 : $i < DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT ? 2 : 3,
+                'user_role_id' => $i < DatabaseConst::ADMIN_AMOUNT ? 1 : ($i < DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT ? 2 : 3),
+                'created_at' => $usernames[$i]['timestamp'],
+                'updated_at' => $usernames[$i]['timestamp']
             ];
         }
 
-        DatabaseSeeder::insertTimestamp('users', $users);
+        DatabaseSeeder::insert('users', $users);
 
         // insert manager
         $managers = array();
         for ($i = DatabaseConst::ADMIN_AMOUNT; $i < DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT; $i++) {
-            $fullname = $usernames[$i]['firstName']." ".$usernames[$i]['lastName'];
-            $birth = $this->calcBirth($faker);
-            $address = 
             $managers[] = ['user_id' => $i + 1,
-                'fullname' => $usernames[$i]['firstName']." ".$usernames[$i]['lastName'],
+                'fullname' => $usernames[$i]['firstName'].' '.$usernames[$i]['lastName'],
                 'birth' => $this->calcBirth($faker),
                 'male' => $usernames[$i]['male'],
                 'address' => $faker->streetAddress.', '.$faker->city.', '.$faker->country,
-                'phone' => strtok($faker->e164PhoneNumber,' ')
+                'phone' => strtok($faker->e164PhoneNumber,' '),
+                'created_at' => $usernames[$i]['timestamp'],
+                'updated_at' => $usernames[$i]['timestamp']
             ];
         }
 
@@ -77,14 +78,14 @@ class UsersSeeder extends Seeder
         // insert customer
         $customers = array();
         for ($i = DatabaseConst::ADMIN_AMOUNT + DatabaseConst::MANAGER_AMOUNT; $i < $totalUser; $i++) {
-            $fullname = $usernames[$i]['firstName']." ".$usernames[$i]['lastName'];
-            $birth = $this->calcBirth($faker);
             $customers[] = ['user_id' => $i + 1,
-                'fullname' => $usernames[$i]['firstName']." ".$usernames[$i]['lastName'],
+                'fullname' => $usernames[$i]['firstName'].' '.$usernames[$i]['lastName'],
                 'birth' => $this->calcBirth($faker),
                 'male' => $usernames[$i]['male'],
                 'address' => $faker->streetAddress.', '.$faker->city.', '.$faker->country,
-                'phone' => strtok($faker->e164PhoneNumber,' ')
+                'phone' => strtok($faker->e164PhoneNumber,' '),
+                'created_at' => $usernames[$i]['timestamp'],
+                'updated_at' => $usernames[$i]['timestamp']
             ];
         }
 

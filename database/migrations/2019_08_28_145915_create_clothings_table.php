@@ -23,7 +23,7 @@ class CreateClothingsTable extends Migration
             $table->integer('gender')->default(1);
             $table->integer('age')->default(1);
             $table->string('material', 128)->nullable();
-            $table->string('country', 32)->nullable();
+            $table->string('country', 64)->nullable();
             $table->boolean('active')->default(true);
             $table->double('price')->default(0.0);
             $table->integer('discount')->default(0);

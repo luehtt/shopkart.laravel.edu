@@ -28,15 +28,18 @@ class CommentsSeeder extends Seeder
         $clothingNumber = count($clothingList);
 
         for ($i = 0; $i < DatabaseConst::CUSTOMER_COMMENT_AMOUNT; $i++) {
+            $timestamp = $faker->dateTimeBetween($startDate = DatabaseConst::DEFAULT_OFFSET_YEAR.' years', $endDate = 'now')->format('Y-m-d H:i:s');
             $comments[] = ['id' => $i + 1,
-                'customer_id' => $customerList[$faker->randomNumber(1, $customerNumber) - 1],
-                'clothing_id' => $clothingList[$faker->randomNumber(1, $clothingNumber) - 1],
-                'rating' => $faker.randomNumer(1, 5),
-                'comment' => $faker->text($maxNbChars = 255))
+                'customer_id' => $customerList[$faker->numberBetween(1, $customerNumber) - 1],
+                'clothing_id' => $clothingList[$faker->numberBetween(1, $clothingNumber) - 1],
+                'rating' => $faker->numberBetween(1, 5),
+                'comment' => $faker->text($maxNbChars = 255),
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp
             ];
         }
 
-        DatabaseSeeder::insertTimestamp('customer_comments', $comments);
+        DatabaseSeeder::insert('customer_comments', $comments);
     }
 
     private function calcCustomerList($faker) {
@@ -45,8 +48,8 @@ class CommentsSeeder extends Seeder
         $amount = DatabaseConst::CUSTOMER_AMOUNT / 5;
 
         $a = array();
-        for ($i = 0, $i < $amount; i++) {
-            $a[] = $faker = randomNumber($min = $min, $max = $max);
+        for ($i = 0; $i < $amount; $i++) {
+            $a[] = $faker->numberBetween($min, $max);
         }
         return $a;
     }
@@ -55,8 +58,8 @@ class CommentsSeeder extends Seeder
         $amount = DatabaseConst::CLOTHING_AMOUNT / 5;
 
         $a = array();
-        for ($i = 0, $i < $amount; i++) {
-            $a[] = $faker = randomNumber($min = 1, $max = DatabaseConst::CLOTHING_AMOUNT);
+        for ($i = 0; $i < $amount; $i++) {
+            $a[] = $faker->numberBetween(1, DatabaseConst::CLOTHING_AMOUNT);
         }
         return $a;
     }

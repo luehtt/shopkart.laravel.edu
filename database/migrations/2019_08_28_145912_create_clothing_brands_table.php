@@ -16,7 +16,7 @@ class CreateClothingBrandsTable extends Migration
         Schema::create('clothing_brands', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 128)->unique();
-            $table->string('country', 32)->nullable();
+            $table->string('country', 64)->nullable();
             $table->timestamps();
         });
     }
